@@ -305,6 +305,8 @@ kbd {
 
 .tile-title,
 .card-link span {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -349,6 +351,10 @@ kbd {
   padding: 0;
   display: grid;
   gap: 4px;
+}
+
+.card li {
+  min-width: 0;
 }
 
 .card .card-link {
