@@ -27,7 +27,7 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: xvfb-run --auto-servernum pnpm test:e2e
       - run: pnpm zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: stash-chrome
           path: .output/*.zip
