@@ -1,0 +1,12 @@
+{
+  "extends": "./.wxt/tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "types": ["chrome", "node"]
+  },
+  "exclude": [".output", "node_modules"]
+}

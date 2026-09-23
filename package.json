@@ -1,0 +1,47 @@
+{
+  "name": "stash",
+  "description": "Replace the bookmark bar. Save any link in one key, find it in three seconds.",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "postinstall": "wxt prepare",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "size": "node scripts/check-size.mjs"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "dexie": "^4.4.6",
+    "minisearch": "^7.2.0",
+    "preact": "^10.29.8"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.14",
+    "@playwright/test": "^1.63.0",
+    "@preact/preset-vite": "^2.10.6",
+    "@types/chrome": "^0.3.0",
+    "@types/node": "^22.20.4",
+    "fake-indexeddb": "^6.2.5",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7",
+    "wxt": "^0.21.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "spawn-sync"
+    ]
+  }
+}
