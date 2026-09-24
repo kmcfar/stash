@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <title>Stash</title>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="#FF5A5F"/>
+  <path d="M40 30h48a6 6 0 0 1 6 6v64.5a3 3 0 0 1-4.8 2.4L64 84 38.8 102.9A3 3 0 0 1 34 100.5V36a6 6 0 0 1 6-6z" fill="#fff"/>
+  <path d="M64 44l4.2 9.8L78 58l-9.8 4.2L64 72l-4.2-9.8L50 58l9.8-4.2z" fill="#FF5A5F"/>
+</svg>

@@ -7,6 +7,7 @@ export interface CaptureResult {
   description: string;
   favicon?: string;
   referrer?: string;
+  excerpt?: string;
   text: string;
 }
 
@@ -23,16 +24,18 @@ function favicon(): string | undefined {
   return link?.href || undefined;
 }
 
-function mainText(): string {
+function readArticle(): { text: string; excerpt?: string } {
   try {
     const article = new Readability(document.cloneNode(true) as Document, {
       charThreshold: 200,
     }).parse();
-    if (article?.textContent) return article.textContent;
+    if (article?.textContent) {
+      return { text: article.textContent, excerpt: article.excerpt ?? undefined };
+    }
   } catch {
     // Fall through to the plain body text.
   }
-  return document.body?.innerText ?? '';
+  return { text: document.body?.innerText ?? '' };
 }
 
 /**
@@ -41,13 +44,15 @@ function mainText(): string {
  * to a model.
  */
 export default defineUnlistedScript((): CaptureResult => {
-  const text = mainText().replace(/\s+/g, ' ').trim().slice(0, MAX_TEXT);
+  const article = readArticle();
+  const text = article.text.replace(/\s+/g, ' ').trim().slice(0, MAX_TEXT);
   return {
     url: location.href,
     title: meta('meta[property="og:title"]') || document.title,
     description: meta('meta[name="description"]') || meta('meta[property="og:description"]'),
     favicon: favicon(),
     referrer: document.referrer || undefined,
+    excerpt: article.excerpt,
     text,
   };
 });

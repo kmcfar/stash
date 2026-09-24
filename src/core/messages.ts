@@ -2,7 +2,7 @@ import type { Link } from './types';
 
 /** Every mutation goes through the background worker, which is the only DB writer. */
 export type Request =
-  | { type: 'saveTab' }
+  | { type: 'saveTab'; toast?: boolean }
   | { type: 'saveWindow'; close: boolean }
   | { type: 'open'; id: string; background?: boolean }
   | {
@@ -12,6 +12,7 @@ export type Request =
     }
   | { type: 'delete'; id: string }
   | { type: 'undoSave'; id: string }
+  | { type: 'restore'; link: Link }
   | { type: 'renameCollection'; from: string; to: string }
   | { type: 'importBookmarks' }
   | { type: 'importJson'; json: string }

@@ -1,6 +1,6 @@
 import { createLink, mergeResave, type NewLinkInput } from '../core/links';
 import type { Link } from '../core/types';
-import { normalizeUrl } from '../core/url';
+import { isOpenable, normalizeUrl } from '../core/url';
 import { cleanCollectionName, cleanText } from '../core/validate';
 import { db as defaultDb, type StashDb } from './db';
 
@@ -94,6 +94,14 @@ export async function deleteLink(
   const link = await database.links.get(id);
   await database.links.delete(id);
   return link;
+}
+
+/** Undo for a delete: put back exactly the link the UI removed. */
+export async function restoreLink(link: Link, database: StashDb = defaultDb): Promise<void> {
+  if (!link || typeof link.id !== 'string' || !isOpenable(link.url)) return;
+  const clash = await database.links.where('normalizedUrl').equals(link.normalizedUrl).first();
+  if (clash && clash.id !== link.id) return;
+  await database.links.put(link);
 }
 
 export async function renameCollection(

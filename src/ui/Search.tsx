@@ -13,6 +13,7 @@ interface Props {
   children?: ComponentChildren;
   /** Newtab navigates in place; the popup always opens a new tab. */
   openInNewTab?: boolean;
+  onDelete: (link: Link) => void;
 }
 
 export function openLink(link: Link, background: boolean): void {
@@ -23,15 +24,18 @@ export function pinLink(link: Link): void {
   send({ type: 'update', id: link.id, patch: { pinned: !link.pinned } }).catch(() => {});
 }
 
-export function archiveLink(link: Link): void {
-  send({ type: 'update', id: link.id, patch: { archived: true } }).catch(() => {});
-}
-
 /**
  * Search box and results, following the ARIA combobox pattern: focus stays in
  * the input and arrow keys move the active option.
  */
-export function Search({ links, initialQuery = '', placeholder, children, openInNewTab }: Props) {
+export function Search({
+  links,
+  initialQuery = '',
+  placeholder,
+  children,
+  openInNewTab,
+  onDelete,
+}: Props) {
   const [query, setQuery] = useState(initialQuery);
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -69,6 +73,9 @@ export function Search({ links, initialQuery = '', placeholder, children, openIn
         e.preventDefault();
         open(link, e.metaKey || e.ctrlKey);
       }
+    } else if (e.key === 'Backspace' && (e.metaKey || e.ctrlKey) && results[active]) {
+      e.preventDefault();
+      onDelete(results[active]);
     } else if (e.key === 'Escape' && query) {
       e.preventDefault();
       setQuery('');
@@ -111,7 +118,7 @@ export function Search({ links, initialQuery = '', placeholder, children, openIn
                 onOpen={open}
                 onHover={() => setActive(i)}
                 onTogglePin={pinLink}
-                onArchive={archiveLink}
+                onDelete={onDelete}
               />
             ))}
           </div>

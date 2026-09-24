@@ -1,6 +1,13 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { StashDb } from '../src/platform/db';
-import { importLinks, recordOpen, renameCollection, saveLink } from '../src/platform/store';
+import {
+  deleteLink,
+  importLinks,
+  recordOpen,
+  renameCollection,
+  restoreLink,
+  saveLink,
+} from '../src/platform/store';
 
 let n = 0;
 const fresh = () => new StashDb(`test-${n++}`);
@@ -41,5 +48,22 @@ describe('store', () => {
     expect((await db.links.get(link.id))?.collection).toBe('New name');
     await recordOpen(link.id, db);
     expect((await db.links.get(link.id))?.openCount).toBe(1);
+  });
+
+  it('restores a deleted link exactly, but never over a re-saved one', async () => {
+    const db = fresh();
+    dbs.push(db);
+    const { link } = await saveLink({ url: 'https://a.com/doc' }, db);
+    await recordOpen(link.id, db);
+    const removed = await deleteLink(link.id, db);
+    if (!removed) throw new Error('expected the deleted link');
+    expect(await db.links.count()).toBe(0);
+    await restoreLink(removed, db);
+    expect((await db.links.get(link.id))?.openCount).toBe(1);
+
+    await deleteLink(link.id, db);
+    await saveLink({ url: 'https://a.com/doc' }, db);
+    await restoreLink(removed, db);
+    expect(await db.links.count()).toBe(1);
   });
 });

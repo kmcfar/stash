@@ -28,7 +28,7 @@ export default defineConfig({
       },
       _execute_action: {
         suggested_key: { default: 'Alt+Shift+F' },
-        description: 'Search your Stash',
+        description: 'Save this page and search your Stash',
       },
     },
     incognito: 'not_allowed',

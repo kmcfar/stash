@@ -9,7 +9,7 @@ interface Props {
   onOpen: (link: Link, background: boolean) => void;
   onHover: () => void;
   onTogglePin: (link: Link) => void;
-  onArchive: (link: Link) => void;
+  onDelete: (link: Link) => void;
 }
 
 /** Chrome's local favicon cache: no network request to the saved site. */
@@ -33,7 +33,7 @@ export function Favicon({ link }: { link: Link }) {
   );
 }
 
-export function LinkRow({ link, id, active, onOpen, onHover, onTogglePin, onArchive }: Props) {
+export function LinkRow({ link, id, active, onOpen, onHover, onTogglePin, onDelete }: Props) {
   const openable = isOpenable(link.url);
   const detail = link.summary || link.description;
   const opened = link.openCount ? `Opened ${link.openCount}×` : 'Never opened';
@@ -83,11 +83,11 @@ export function LinkRow({ link, id, active, onOpen, onHover, onTogglePin, onArch
         <button
           type="button"
           class="icon-btn"
-          aria-label="Archive"
-          title="Archive"
+          aria-label="Delete"
+          title="Delete (⌘⌫)"
           onClick={(e) => {
             e.stopPropagation();
-            onArchive(link);
+            onDelete(link);
           }}
         >
           ✕

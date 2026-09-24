@@ -1,7 +1,7 @@
 import { defineBackground } from 'wxt/utils/define-background';
 import type { Request } from '../src/core/messages';
 import { createIndex, type LinkIndex, searchLinks } from '../src/core/search';
-import { trimPageText } from '../src/core/text';
+import { pickDescription, trimPageText } from '../src/core/text';
 import { displayTitle, type Link } from '../src/core/types';
 import { isNeverRead, isOpenable } from '../src/core/url';
 import { refreshActiveBadge, updateBadge } from '../src/platform/badge';
@@ -90,6 +90,7 @@ function changed(): void {
 
 async function saveTab(
   tab: chrome.tabs.Tab,
+  showConfirmation = true,
 ): Promise<Awaited<ReturnType<typeof store.saveLink>> | null> {
   if (!tab.url || !isOpenable(tab.url) || tab.incognito) return null;
   const settings = await getSettings();
@@ -112,14 +113,18 @@ async function saveTab(
   const outcome = await store.saveLink({
     url: tab.url,
     title: captured?.title || tab.title,
-    description: captured?.description,
+    description: pickDescription(captured?.title || tab.title || '', [
+      captured?.description,
+      captured?.excerpt,
+      captured?.text,
+    ]),
     favicon: captured?.favicon || tab.favIconUrl,
     pageText: captured?.text ? trimPageText(captured.text, PAGE_TEXT_CHARS) : undefined,
     context,
   });
   changed();
 
-  if (tab.id !== undefined) {
+  if (showConfirmation && tab.id !== undefined) {
     const prefix = outcome.duplicate ? 'Already saved' : 'Saved';
     await toast(tab.id, `${prefix} → ${outcome.link.collection}`, outcome.link.id);
   }
@@ -201,7 +206,7 @@ async function handle(message: Request, sender: chrome.runtime.MessageSender): P
   switch (message.type) {
     case 'saveTab': {
       const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-      const outcome = tab ? await saveTab(tab) : null;
+      const outcome = tab ? await saveTab(tab, message.toast ?? true) : null;
       return outcome ? { ok: true, ...outcome } : { ok: false, error: 'This page can’t be saved.' };
     }
     case 'saveWindow':
@@ -223,6 +228,10 @@ async function handle(message: Request, sender: chrome.runtime.MessageSender): P
     case 'delete':
     case 'undoSave':
       await store.deleteLink(message.id);
+      changed();
+      return { ok: true };
+    case 'restore':
+      await store.restoreLink(message.link);
       changed();
       return { ok: true };
     case 'renameCollection':

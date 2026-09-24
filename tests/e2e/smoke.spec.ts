@@ -90,3 +90,20 @@ test('new tab welcomes, finds a saved link by meaning, and opens it', async () =
   await again.getByRole('combobox').fill('webhooks');
   await expect(again.getByRole('option')).toContainText('Opened 1×');
 });
+
+test('deleting a link offers undo', async () => {
+  const page = await context.newPage();
+  await page.goto(`chrome-extension://${extensionId}/newtab.html`);
+  const box = page.getByRole('combobox');
+  await box.fill('hmac');
+  await expect(page.getByRole('option')).toHaveCount(1);
+
+  await page.getByRole('option').hover();
+  await page.getByRole('button', { name: 'Delete' }).click();
+  await expect(page.getByText('Nothing matches')).toBeVisible();
+  await page.getByRole('button', { name: 'Undo' }).click();
+  await expect(page.getByRole('option')).toHaveCount(1);
+
+  await box.press('ControlOrMeta+Backspace');
+  await expect(page.getByText('Nothing matches')).toBeVisible();
+});
